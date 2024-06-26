@@ -5,14 +5,13 @@ from OpenGL.constants import GLfloat_3, GLfloat_4
 from OpenGL.GLU import gluPerspective, gluUnProject
 
 
-import numpy as np
+import numpy
 from numpy.linalg import norm, inv
 
-#A LOT OF STUFF NEEDS TO BE ADDED HERE
-#SCENE MODULE
-#NODE MODULE
-#PRIMITIVE MODULE --> as of 26/6 im working on this module (idk if it'll be here so ill add the time 4:44 pm IST)
-#INTERACTION MODULE
+from interaction import Interaction
+from primitive import init_primitives, G_OBJ_PLANE
+from node import Sphere, Cube, SnowFigure
+from scene import Scene
 
 
 class Viewer(object):
@@ -28,7 +27,7 @@ class Viewer(object):
         """ initialize the window and register the render function """
         glutInit()
         glutInitWindowSize(640, 480)
-        glutCreateWindow("3D Modeller")
+        glutCreateWindow(b"3D Modeller")
         glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
         glutDisplayFunc(self.render)
 
