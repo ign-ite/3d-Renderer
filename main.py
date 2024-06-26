@@ -60,8 +60,53 @@ class Viewer(object):
         self.interaction.register_callback('place', self.place)
         self.interaction.register_callback('rotate_color', self.rotate_color)
         self.interaction.register_callback('scale', self.scale)
+
+    def render(self):
+        self.init_view()
+        glEnable(GL_LIGHTING)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        loc = self.interaction.translation
+        glTranslated(loc[0], loc[1], loc[2])
+        glMultMatrixf(self.interaction.trackball.matrix)
+        currentModelView = numpy.array(glGetFloatv(GL_MODELVIEW_MATRIX))
+        self.modelView = numpy.transpose(currentModelView)
+        self.inverseModelView = inv(numpy.transpose(currentModelView))
+        self.scene.render()
+        glDisable(GL_LIGHTING)
+        glCallList(G_OBJ_PLANE)
+        glPopMatrix()
+        glFlush()
+
+    def init_view(self):
+        xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
+        aspect_ratio = float(xSize) / float(ySize)
+
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+
+        glViewport(0, 0, xSize, ySize)
+        gluPerspective(70, aspect_ratio, 0.1, 1000.0)
+        glTranslated(0, 0, -15)
     def main_loop(self):
         glutMainLoop()
+
+class Scene(object):
+
+    PLACE_DEPTH = 15.0
+
+    def __init__(self):
+        self.node_list = list()
+        self.selected_node = None
+
+    def add_node(self, node):
+        self.node_list.append(node)
+
+    def render(self):
+        for node in self.node_list:
+            node.render()
 
 if __name__ == "__main__":
     viewer = Viewer()
